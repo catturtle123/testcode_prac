@@ -1,11 +1,11 @@
 package com.example.demo.post.domain;
 
+import com.example.demo.mock.TestClockHolder;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,10 +29,11 @@ class PostTest {
                 .build();
 
         //when
-        Post post = Post.from(postCreate, writer);
+        Post post = Post.from(postCreate, writer, new TestClockHolder(1234L));
 
         //then
         Assertions.assertThat(post.getContent()).isEqualTo("helloworld");
+        Assertions.assertThat(post.getCreatedAt()).isEqualTo(1234L);
         Assertions.assertThat(post.getWriter().getEmail()).isEqualTo("k@naver.com");
         Assertions.assertThat(post.getWriter().getNickname()).isEqualTo("k");
         Assertions.assertThat(post.getWriter().getAddress()).isEqualTo("Seoul");

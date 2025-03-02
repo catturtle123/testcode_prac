@@ -15,4 +15,6 @@ public interface UserRepository {
     User save(User userEntity);
 
     Optional<User> findById(long id);
+
+    User getById(long writerId);
 }
