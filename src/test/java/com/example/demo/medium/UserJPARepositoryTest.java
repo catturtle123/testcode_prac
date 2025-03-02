@@ -1,6 +1,8 @@
-package com.example.demo.user.infastructure;
+package com.example.demo.medium;
 
 import com.example.demo.user.domain.UserStatus;
+import com.example.demo.user.infastructure.UserEntity;
+import com.example.demo.user.infastructure.UserJPARepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
