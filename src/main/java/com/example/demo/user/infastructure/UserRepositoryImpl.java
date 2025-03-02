@@ -1,5 +1,6 @@
 package com.example.demo.user.infastructure;
 
+import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserStatus;
 import com.example.demo.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,22 +16,22 @@ public class UserRepositoryImpl implements UserRepository {
 
 
     @Override
-    public Optional<UserEntity> findByIdAndStatus(long id, UserStatus userStatus) {
-        return userJPARepository.findByIdAndStatus(id, userStatus);
+    public Optional<User> findByIdAndStatus(long id, UserStatus userStatus) {
+        return userJPARepository.findByIdAndStatus(id, userStatus).map(UserEntity::toModel);
     }
 
     @Override
-    public Optional<UserEntity> findByEmailAndStatus(String email, UserStatus userStatus) {
-        return userJPARepository.findByEmailAndStatus(email, userStatus);
+    public Optional<User> findByEmailAndStatus(String email, UserStatus userStatus) {
+        return userJPARepository.findByEmailAndStatus(email, userStatus).map(UserEntity::toModel);
     }
 
     @Override
-    public UserEntity save(UserEntity userEntity) {
-        return userJPARepository.save(userEntity);
+    public User save(User user) {
+        return userJPARepository.save(UserEntity.fromModel(user)).toModel();
     }
 
     @Override
-    public Optional<UserEntity> findById(long id) {
-        return userJPARepository.findById(id);
+    public Optional<User> findById(long id) {
+        return userJPARepository.findById(id).map(UserEntity::toModel);
     }
 }

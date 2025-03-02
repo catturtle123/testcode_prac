@@ -1,8 +1,9 @@
 package com.example.demo.post.service;
 
 import com.example.demo.common.domain.exception.ResourceNotFoundException;
-import com.example.demo.post.domain.dto.PostCreate;
-import com.example.demo.post.domain.dto.PostUpdate;
+import com.example.demo.post.domain.Post;
+import com.example.demo.post.domain.PostCreate;
+import com.example.demo.post.domain.PostUpdate;
 import com.example.demo.post.infastructure.PostEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ class PostServiceTest {
 
 
         //when
-        PostEntity postById = postService.getPostById(2L);
+        Post postById = postService.getPostById(2L);
 
 
         //then
@@ -50,7 +51,7 @@ class PostServiceTest {
 
         //then
         assertThatThrownBy(()->{
-            PostEntity postById = postService.getPostById(31289398127398217L);
+            Post postById = postService.getPostById(31289398127398217L);
         }).isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -62,7 +63,7 @@ class PostServiceTest {
                         .writerId(2L)
                         .build();
         //when
-        PostEntity postEntity = postService.create(postCreate);
+        Post postEntity = postService.create(postCreate);
 
         //then
         assertThat(postEntity.getId()).isNotNull();
@@ -78,7 +79,7 @@ class PostServiceTest {
         postService.update(2L, postUpdate);
 
         //then
-        PostEntity postById = postService.getPostById(2L);
+        Post postById = postService.getPostById(2L);
         assertThat(postById.getContent()).isEqualTo("안녕하세요!");
     }
 }

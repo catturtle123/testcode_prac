@@ -1,6 +1,6 @@
 package com.example.demo.post.controller;
 
-import com.example.demo.post.domain.dto.PostCreate;
+import com.example.demo.post.domain.PostCreate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

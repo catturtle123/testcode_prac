@@ -2,6 +2,7 @@ package com.example.demo.user.service;
 
 import com.example.demo.common.domain.exception.CertificationCodeNotMatchedException;
 import com.example.demo.common.domain.exception.ResourceNotFoundException;
+import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserStatus;
 import com.example.demo.user.domain.UserCreate;
 import com.example.demo.user.domain.UserUpdate;
@@ -41,7 +42,7 @@ class UserServiceTest {
         String email = "a@naver.com";
 
         // when
-        UserEntity result = userService.getByEmail(email);
+        User result = userService.getByEmail(email);
 
         // then
         assertEquals(result.getNickname(), "jamey");
@@ -64,7 +65,7 @@ class UserServiceTest {
         String email = "a@naver.com";
 
         // when
-        UserEntity result = userService.getById(2);
+        User result = userService.getById(2);
 
         // then
         assertEquals(result.getNickname(), "jamey");
@@ -93,7 +94,7 @@ class UserServiceTest {
         Mockito.doNothing().when(mailSender).send(any(SimpleMailMessage.class));
 
         // when
-        UserEntity result = userService.create(userCreate);
+        User result = userService.create(userCreate);
 
         // then
         assertNotNull(result.getId());
@@ -111,10 +112,10 @@ class UserServiceTest {
 
 
         // when
-        UserEntity result = userService.update(2, userUpdate);
+        User result = userService.update(2, userUpdate);
 
         // then
-        UserEntity userEntity = userService.getById(2);
+        User userEntity = userService.getById(2);
         assertNotNull(userEntity.getId());
         assertEquals(userEntity.getNickname(), "su");
         assertEquals(userEntity.getAddress(), "root");
@@ -129,7 +130,7 @@ class UserServiceTest {
         userService.login(2);
 
         // then
-        UserEntity userEntity = userService.getById(2);
+        User userEntity = userService.getById(2);
         Assertions.assertThat(userEntity.getLastLoginAt()).isGreaterThan(0);
 //        assertEquals(userEntity.getLastLoginAt(), ㅠㅠ);
     }
@@ -140,10 +141,10 @@ class UserServiceTest {
 
 
         // when
-        userService.verifyEmail(3, "aaaa-aaaaa");
+        userService.certificate(3, "aaaa-aaaaa");
 
         // then
-        UserEntity userEntity = userService.getById(3);
+        User userEntity = userService.getById(3);
         Assertions.assertThat(userEntity.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 
@@ -156,7 +157,7 @@ class UserServiceTest {
 
 
         // then
-        assertThrows(CertificationCodeNotMatchedException.class, () -> userService.verifyEmail(3, "aaaa-aaaaas"));
+        assertThrows(CertificationCodeNotMatchedException.class, () -> userService.certificate(3, "aaaa-aaaaas"));
     }
 
 }
