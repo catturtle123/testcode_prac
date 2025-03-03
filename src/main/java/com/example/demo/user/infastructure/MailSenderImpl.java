@@ -1,6 +1,5 @@
 package com.example.demo.user.infastructure;
 
-import com.example.demo.user.service.CertificationService;
 import com.example.demo.user.service.port.MailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;

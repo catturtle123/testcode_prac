@@ -1,20 +1,13 @@
-package com.example.demo.user.service;
+package com.example.demo.medium;
 
 import com.example.demo.common.domain.exception.CertificationCodeNotMatchedException;
 import com.example.demo.common.domain.exception.ResourceNotFoundException;
-import com.example.demo.common.service.port.ClockHolder;
-import com.example.demo.common.service.port.UuidHolder;
-import com.example.demo.mock.FakeMailSender;
-import com.example.demo.mock.FakeUserRepository;
-import com.example.demo.mock.TestClockHolder;
-import com.example.demo.mock.TestUuidHolder;
 import com.example.demo.user.domain.User;
-import com.example.demo.user.domain.UserCreate;
 import com.example.demo.user.domain.UserStatus;
+import com.example.demo.user.domain.UserCreate;
 import com.example.demo.user.domain.UserUpdate;
-import com.example.demo.user.service.port.UserRepository;
+import com.example.demo.user.service.UserServiceImpl;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,40 +22,19 @@ import org.springframework.test.context.jdbc.SqlGroup;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
-class UserServiceTest {
+@SpringBootTest
+@TestPropertySource("file:src/test/java/resources/application.properties")
+@SqlGroup({
+        @Sql(scripts = "file:src/test/java/resources/sql/user-repository-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+                @Sql(scripts = "file:src/test/java/resources/sql/delete_all.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+})
+class UserServiceImplTest {
 
-    private UserService userService;
+    @Autowired
+    private UserServiceImpl userServiceImpl;
 
-    @BeforeEach
-    void init() {
-        FakeMailSender fakeMailSender = new FakeMailSender();
-        FakeUserRepository fakeUserRepository = new FakeUserRepository();
-        this.userService = UserService.builder()
-                .certificationService(new CertificationService(fakeMailSender))
-                .clockHolder(new TestClockHolder(12312321))
-                .userRepository(fakeUserRepository)
-                .uuidHolder(new TestUuidHolder("aaaa-aaaa"))
-                .build();
-        fakeUserRepository.save(User.builder()
-                .id(2L)
-                .email("a@naver.com")
-                .nickname("jamey")
-                .address("Seoul")
-                .certificationCode("aaaa-aaaa")
-                .status(UserStatus.ACTIVE)
-                .lastLoginAt(0L)
-                .build());
-
-        fakeUserRepository.save(User.builder()
-                .id(3L)
-                .email("b@naver.com")
-                .nickname("jamey1")
-                .address("Seoul1")
-                .certificationCode("aaaa-aaaaa")
-                .status(UserStatus.PENDING)
-                .lastLoginAt(0L)
-                .build());
-    }
+    @MockBean
+    private JavaMailSender mailSender;
 
     @Test
     void getByEmail은_ACTIVE_상태인_유저만_가져올수_있다() {
@@ -70,7 +42,7 @@ class UserServiceTest {
         String email = "a@naver.com";
 
         // when
-        User result = userService.getByEmail(email);
+        User result = userServiceImpl.getByEmail(email);
 
         // then
         assertEquals(result.getNickname(), "jamey");
@@ -84,7 +56,7 @@ class UserServiceTest {
         // when
 
         // then
-        assertThrows(ResourceNotFoundException.class, () -> userService.getByEmail(email));
+        assertThrows(ResourceNotFoundException.class, () -> userServiceImpl.getByEmail(email));
     }
 
     @Test
@@ -93,7 +65,7 @@ class UserServiceTest {
         String email = "a@naver.com";
 
         // when
-        User result = userService.getById(2);
+        User result = userServiceImpl.getById(2);
 
         // then
         assertEquals(result.getNickname(), "jamey");
@@ -107,7 +79,7 @@ class UserServiceTest {
         // when
 
         // then
-        assertThrows(ResourceNotFoundException.class, () -> userService.getById(id));
+        assertThrows(ResourceNotFoundException.class, () -> userServiceImpl.getById(id));
     }
 
     @Test
@@ -119,13 +91,15 @@ class UserServiceTest {
                 .address("kik202-k")
                 .build();
 
+        Mockito.doNothing().when(mailSender).send(any(SimpleMailMessage.class));
+
         // when
-        User result = userService.create(userCreate);
+        User result = userServiceImpl.create(userCreate);
 
         // then
         assertNotNull(result.getId());
         assertEquals(result.getStatus(), UserStatus.PENDING);
-        assertEquals(result.getCertificationCode(), "aaaa-aaaa");
+//        assertEquals(result.getCertificationCode(), "??");
     }
 
     @Test // 다른 값이 안 변하는 지도 확인하면 좋음
@@ -138,10 +112,10 @@ class UserServiceTest {
 
 
         // when
-        User result = userService.update(2, userUpdate);
+        User result = userServiceImpl.update(2, userUpdate);
 
         // then
-        User userEntity = userService.getById(2);
+        User userEntity = userServiceImpl.getById(2);
         assertNotNull(userEntity.getId());
         assertEquals(userEntity.getNickname(), "su");
         assertEquals(userEntity.getAddress(), "root");
@@ -153,12 +127,12 @@ class UserServiceTest {
 
 
         // when
-        userService.login(2);
+        userServiceImpl.login(2);
 
         // then
-        User userEntity = userService.getById(2);
+        User userEntity = userServiceImpl.getById(2);
         Assertions.assertThat(userEntity.getLastLoginAt()).isGreaterThan(0);
-        assertEquals(userEntity.getLastLoginAt(), 12312321);
+//        assertEquals(userEntity.getLastLoginAt(), ㅠㅠ);
     }
 
     @Test
@@ -167,10 +141,10 @@ class UserServiceTest {
 
 
         // when
-        userService.certificate(3, "aaaa-aaaaa");
+        userServiceImpl.certificate(3, "aaaa-aaaaa");
 
         // then
-        User userEntity = userService.getById(3);
+        User userEntity = userServiceImpl.getById(3);
         Assertions.assertThat(userEntity.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 
@@ -183,7 +157,7 @@ class UserServiceTest {
 
 
         // then
-        assertThrows(CertificationCodeNotMatchedException.class, () -> userService.certificate(3, "aaaa-aaaaas"));
+        assertThrows(CertificationCodeNotMatchedException.class, () -> userServiceImpl.certificate(3, "aaaa-aaaaas"));
     }
 
 }

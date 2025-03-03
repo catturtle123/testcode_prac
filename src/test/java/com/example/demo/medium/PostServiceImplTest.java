@@ -4,7 +4,7 @@ import com.example.demo.common.domain.exception.ResourceNotFoundException;
 import com.example.demo.post.domain.Post;
 import com.example.demo.post.domain.PostCreate;
 import com.example.demo.post.domain.PostUpdate;
-import com.example.demo.post.service.PostService;
+import com.example.demo.post.service.PostServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,10 +22,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
         @Sql(scripts = "file:src/test/java/resources/sql/post-repository-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
         @Sql(scripts = "file:src/test/java/resources/sql/delete_all.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 })
-class PostServiceTest {
+class PostServiceImplTest {
 
     @Autowired
-    private PostService postService;
+    private PostServiceImpl postServiceImpl;
 
     @Test
     public void 게시물을_id로_조회할_수_있다() {
@@ -33,7 +33,7 @@ class PostServiceTest {
 
 
         //when
-        Post postById = postService.getPostById(2L);
+        Post postById = postServiceImpl.getPostById(2L);
 
 
         //then
@@ -51,7 +51,7 @@ class PostServiceTest {
 
         //then
         assertThatThrownBy(()->{
-            Post postById = postService.getPostById(31289398127398217L);
+            Post postById = postServiceImpl.getPostById(31289398127398217L);
         }).isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -63,7 +63,7 @@ class PostServiceTest {
                         .writerId(2L)
                         .build();
         //when
-        Post postEntity = postService.create(postCreate);
+        Post postEntity = postServiceImpl.create(postCreate);
 
         //then
         assertThat(postEntity.getId()).isNotNull();
@@ -76,10 +76,10 @@ class PostServiceTest {
                 .content("안녕하세요!")
                 .build();
         //when
-        postService.update(2L, postUpdate);
+        postServiceImpl.update(2L, postUpdate);
 
         //then
-        Post postById = postService.getPostById(2L);
+        Post postById = postServiceImpl.getPostById(2L);
         assertThat(postById.getContent()).isEqualTo("안녕하세요!");
     }
 }

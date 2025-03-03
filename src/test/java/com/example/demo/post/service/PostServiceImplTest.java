@@ -1,35 +1,27 @@
 package com.example.demo.post.service;
 
 import com.example.demo.common.domain.exception.ResourceNotFoundException;
-import com.example.demo.common.service.port.ClockHolder;
 import com.example.demo.mock.*;
 import com.example.demo.post.domain.Post;
 import com.example.demo.post.domain.PostCreate;
 import com.example.demo.post.domain.PostUpdate;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserStatus;
-import com.example.demo.user.service.CertificationService;
-import com.example.demo.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class PostServiceTest {
+class PostServiceImplTest {
 
-    private PostService postService;
+    private PostServiceImpl postServiceImpl;
 
     @BeforeEach
     void init() {
         FakePostRepository fakePostRepository = new FakePostRepository();
         FakeUserRepository fakeUserRepository = new FakeUserRepository();
-        this.postService = PostService.builder()
+        this.postServiceImpl = PostServiceImpl.builder()
                 .clockHolder(new TestClockHolder(1234L))
                 .postRepository(fakePostRepository)
                 .userRepository(fakeUserRepository)
@@ -78,7 +70,7 @@ class PostServiceTest {
 
 
         //when
-        Post postById = postService.getPostById(2L);
+        Post postById = postServiceImpl.getPostById(2L);
 
 
         //then
@@ -96,7 +88,7 @@ class PostServiceTest {
 
         //then
         assertThatThrownBy(()->{
-            Post postById = postService.getPostById(31289398127398217L);
+            Post postById = postServiceImpl.getPostById(31289398127398217L);
         }).isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -108,7 +100,7 @@ class PostServiceTest {
                         .writerId(2L)
                         .build();
         //when
-        Post postEntity = postService.create(postCreate);
+        Post postEntity = postServiceImpl.create(postCreate);
 
         //then
         assertThat(postEntity.getId()).isNotNull();
@@ -122,10 +114,10 @@ class PostServiceTest {
                 .content("안녕하세요!")
                 .build();
         //when
-        postService.update(2L, postUpdate);
+        postServiceImpl.update(2L, postUpdate);
 
         //then
-        Post postById = postService.getPostById(2L);
+        Post postById = postServiceImpl.getPostById(2L);
         assertThat(postById.getContent()).isEqualTo("안녕하세요!");
         assertThat(postById.getModifiedAt()).isEqualTo(1234L);
     }
