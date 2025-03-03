@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Builder
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserCreateService, UserUpdateService, UserReadService, AuthenticationService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final CertificationService certificationService;
