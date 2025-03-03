@@ -65,12 +65,13 @@ public class UserController {
             .body(MyProfileResponse.from(user));
     }
 
+    // 위의 메소드와 같은 클래스이지만 응답 값이 다르기에 책임분리가 많이 안되었다는 생각이 듦
     @PutMapping("/me")
     @Parameter(in = ParameterIn.HEADER, name = "EMAIL")
     public ResponseEntity<MyProfileResponse> updateMyInfo(
         @Parameter(name = "EMAIL", in = ParameterIn.HEADER)
         @RequestHeader("EMAIL") String email, // 일반적으로 스프링 시큐리티를 사용한다면 UserPrincipal 에서 가져옵니다.
-        @RequestBody UserUpdate userUpdate
+        @RequestBody UserUpdate userUpdate // 도메인 대신 dto를 사용도 가능
     ) {
         User user = userService.getByEmail(email);
         user = userService.update(user.getId(), userUpdate);
