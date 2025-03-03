@@ -16,6 +16,7 @@ import com.example.demo.user.service.port.MailSender;
 import com.example.demo.user.service.port.UserRepository;
 import lombok.Builder;
 
+// IOC를 직접 구현
 public class TestContainer {
 
     public final MailSender mailSender;
